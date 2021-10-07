@@ -1,0 +1,59 @@
+{
+  "name": "discord-voting",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/Main.js",
+  "scripts": {
+    "build": "tsc",
+    "prod": "node build/Main.js",
+    "dev": "ts-node src/Main.ts",
+    "commands": "ts-node src/deploy-commands.ts"
+  },
+  "keywords": [
+    "discordx",
+    "discord.ts",
+    "discord.js",
+    "bot",
+    "discord",
+    "typescript"
+  ],
+  "author": "Shronk",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/node": "^15.3.1",
+    "@typescript-eslint/eslint-plugin": "^4.24.0",
+    "@typescript-eslint/parser": "^4.24.0",
+    "eslint": "^7.26.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.23.3",
+    "husky": "^4.3.8",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.0",
+    "pretty-quick": "^3.1.0",
+    "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.6",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@types/lowdb": "^1.0.11",
+    "discord.js": "github:discordjs/discord.js",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.12.2",
+    "simple-json-db": "^1.2.3",
+    "winston": "^3.3.3"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --fix --cache --cache-location 'node_modules/.cache/.eslintcache'",
+    "*.{js,ts,md}": "pretty-quick --staged"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lint-staged"
+    }
+  }
+}
