@@ -9,6 +9,7 @@ import DB from "./db";
 import logger from "./utils/logger";
 import { NewPoll } from "./types";
 import { createPoll } from "./service/polls";
+import Whitelist from "./whitelist";
 
 export class Main {
   private static _app: express.Application;
@@ -75,13 +76,42 @@ export class Main {
 
       commands?.create({
         name: "dmpoll",
-        description: "Create a poll using direct messages.",
-        options: []
+        description: "Create a poll using direct messages."
+      });
+
+      commands?.create({
+        name: "whitelistadd",
+        description: "Add (an) address(es) to the whitelist.",
+        options: [
+          {
+            name: "addresses",
+            description: "Address(es) to be added to the whitelist.",
+            required: true,
+            type: Constants.ApplicationCommandOptionTypes.STRING
+          }
+        ]
+      });
+
+      commands?.create({
+        name: "whitelistrm",
+        description: "Remove (an) address(es) from the whitelist.",
+        options: [
+          {
+            name: "addresses",
+            description: "Address(es) to be removed from the whitelist.",
+            required: true,
+            type: Constants.ApplicationCommandOptionTypes.STRING
+          }
+        ]
       });
 
       logger.verbose("Initializing database");
 
       DB.init();
+
+      logger.verbose("Initializing whitelist");
+
+      Whitelist.init();
 
       logger.verbose("Starting express server on port 8080");
 
@@ -117,6 +147,7 @@ export class Main {
             content: "pong",
             ephemeral: true
           });
+
           break;
         }
 
@@ -141,7 +172,7 @@ export class Main {
             interaction
           );
 
-          return;
+          break;
         }
 
         case "dmpoll": {
@@ -165,6 +196,34 @@ export class Main {
                 ephemeral: true
               })
             );
+
+          break;
+        }
+
+        case "whitelistadd": {
+          Whitelist.add(
+            interaction.guildId,
+            options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
+          );
+
+          interaction.reply({
+            content: "The addresses have been added to the whitelist.",
+            ephemeral: true
+          });
+
+          break;
+        }
+
+        case "whitelistrm": {
+          Whitelist.delete(
+            interaction.guildId,
+            options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
+          );
+
+          interaction.reply({
+            content: "The addresses have been removed from the whitelist.",
+            ephemeral: true
+          });
 
           break;
         }

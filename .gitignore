@@ -1,6 +1,12 @@
+# Output and dependency folders
 build
 dist
 node_modules
+
+# Env variables
 .env
+
+# Databases
 db.json
 polls.json
+whitelist.json
