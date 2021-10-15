@@ -8,34 +8,30 @@ export default class DB {
 
   private static _id: number;
 
-  static init() {
+  static init = () => {
     this._db = new JSONdb("db.json");
     const idObj = this._db.get("id");
     this._id = Number(idObj ? (idObj as any).value : 0);
     this._db.set("id", { value: this._id.toString() });
-  }
+  };
 
-  static get(key: string): Poll {
-    return this._db.get(key) as Poll;
-  }
+  static get = (key: string): Poll => this._db.get(key) as Poll;
 
-  static set(key: Number, value: Poll) {
+  static set = (key: Number, value: Poll) => {
     this._db.set(`${key}`, value);
     this._db.sync();
-  }
+  };
 
-  static add(value: Poll) {
+  static add = (value: Poll) => {
     this.set(this._id, value);
     this._id += 1;
     this._db.set("id", { value: this._id.toString() });
-  }
+  };
 
-  static delete(key: string) {
+  static delete = (key: string) => {
     this._db.delete(key);
     this._db.sync();
-  }
+  };
 
-  static lastId(): number {
-    return this._id;
-  }
+  static lastId = (): number => this._id;
 }

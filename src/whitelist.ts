@@ -9,16 +9,16 @@ export default class Whitelist {
     this._db = new JSONdb("whitelist.json");
   }
 
-  static add(serverId: string, addresses: string[]) {
+  static add = (serverId: string, addresses: string[]) => {
     const addrsInDb = this._db.get(serverId) as string[];
 
     let addrs = [...new Set(addresses.concat(addrsInDb ? addrsInDb : []))];
 
     this._db.set(serverId, addrs);
     this._db.sync();
-  }
+  };
 
-  static delete(serverId: string, addresses: string[]) {
+  static delete = (serverId: string, addresses: string[]) => {
     this._db.set(
       serverId,
       (this._db.get(serverId) as string[]).filter(
@@ -26,5 +26,8 @@ export default class Whitelist {
       )
     );
     this._db.sync();
-  }
+  };
+
+  static contains = (serverId: string, address: string) =>
+    (this._db.get(serverId) as string[])?.includes(address);
 }
