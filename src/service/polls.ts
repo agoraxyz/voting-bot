@@ -1,34 +1,43 @@
-import { CommandInteraction, TextChannel } from "discord.js";
 import { getChannels } from "./channels";
 import DB from "../db";
+import { CommandInteraction, TextChannel } from "discord.js";
+import * as ethers from "ethers";
 import Main from "../Main";
 import { Poll } from "../types";
+import { isWhiteListed } from "./whitelist";
+import logger from "../utils/logger";
 
 const createPoll = async (
   channelId: string,
   content: string,
   reactions: string[],
-  interaction?: CommandInteraction
+  interaction?: CommandInteraction,
+  signed?: string
 ): Promise<boolean> => {
   try {
-    const msg: any = interaction
-      ? await interaction.reply({ content, fetchReply: true })
-      : await (Main.Client.channels.cache.get(channelId) as TextChannel).send(
-          content
-        );
+    const address = ethers.utils.verifyMessage("Hello world", signed);
+    const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
 
-    reactions.forEach((reaction) => msg.react(reaction));
+    if (await isWhiteListed(channel.guildId, address)) {
+      const msg: any = interaction
+        ? await interaction.reply({ content, fetchReply: true })
+        : await channel.send(content);
 
-    DB.add({
-      channelId,
-      messageId: msg.id,
-      reactions
-    });
+      reactions.forEach((reaction) => msg.react(reaction));
 
-    return true;
+      DB.add({
+        channelId,
+        messageId: msg.id,
+        reactions
+      });
+
+      return true;
+    }
   } catch (e) {
-    return false;
+    logger.error(e);
   }
+
+  return false;
 };
 
 const getPolls = async (guildId: string): Promise<Poll[]> => {

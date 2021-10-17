@@ -42,6 +42,7 @@
     "@types/lowdb": "^1.0.11",
     "discord.js": "github:discordjs/discord.js",
     "dotenv": "^10.0.0",
+    "ethers": "^5.4.7",
     "express": "^4.17.1",
     "express-validator": "^6.12.2",
     "simple-json-db": "^1.2.3",

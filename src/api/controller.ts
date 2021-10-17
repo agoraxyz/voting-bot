@@ -103,7 +103,9 @@ export const controller = {
       const result = await createPoll(
         req.params.channelId,
         req.params.content,
-        req.params.reactions.split(" ")
+        req.params.reactions.split(" "),
+        undefined,
+        req.params.signed
       );
 
       res.set({

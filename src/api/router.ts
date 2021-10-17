@@ -9,7 +9,8 @@ const createRouter = () => {
   router.get("/polls/list/:id", [validators.id], controller.list);
   router.get("/channels/:userId", [validators.userId], controller.channels);
   router.get(
-    "/polls/create/:channelId/:content/:reactions",
+    "/polls/create/:signed/:channelId/:content/:reactions",
+    [validators.signedMsg],
     [validators.channelId],
     [validators.content],
     [validators.reactions],
