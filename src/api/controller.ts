@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import DB from "../db";
+import DB from "../utils/db";
 import { getAvailableChannels } from "../service/channels";
 import { createPoll, getPolls } from "../service/polls";
 import { getReactions } from "../service/reactions";
@@ -33,7 +33,7 @@ export const controller = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
       });
-      res.status(200).json(result);
+      res.status(200).json(result.map(react => react.users.length));
     } catch (e) {
       res.status(400).json(e);
     }

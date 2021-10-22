@@ -11,6 +11,7 @@ type Poll = {
   channelId: string;
   messageId: string;
   reactions: string[];
+  ended: boolean;
 };
 
 type Reaction = {

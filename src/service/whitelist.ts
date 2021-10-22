@@ -1,4 +1,4 @@
-import WhiteList from "../whitelist";
+import WhiteList from "../utils/whitelist";
 
 const isWhiteListed = async (
   serverId: string,

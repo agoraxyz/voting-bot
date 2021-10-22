@@ -1,3 +1,4 @@
+import { TextChannel } from "discord.js";
 import Main from "../Main";
 import { Reaction } from "../types";
 
@@ -5,9 +6,10 @@ export const getReactions = async (
   channelId: string,
   messageId: string,
   include: string[]
-): Promise<Reaction> => {
-  const channel = await Main.Client.channels.cache.get(channelId);
-  const message = await (channel as any).messages.fetch(messageId);
+): Promise<Reaction[]> => {
+  const message = await (
+    (await Main.Client.channels.fetch(channelId)) as TextChannel
+  ).messages.fetch(messageId);
   return (await Promise.all(
     message.reactions.cache
       .filter((reaction) =>
@@ -23,5 +25,5 @@ export const getReactions = async (
           .map((user) => user.id)
           .filter((id) => id !== Main.Client.user.id)
       }))
-  )) as any as Reaction;
+  )) as Reaction[];
 };

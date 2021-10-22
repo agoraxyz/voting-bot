@@ -5,11 +5,11 @@ import express from "express";
 import JSONdb from "simple-json-db";
 import createRouter from "./api/router";
 import config from "./config";
-import DB from "./db";
+import DB from "./utils/db";
 import logger from "./utils/logger";
 import { NewPoll } from "./types";
 import { createPoll } from "./service/polls";
-import Whitelist from "./whitelist";
+import Whitelist from "./utils/whitelist";
 
 export class Main {
   private static _app: express.Application;

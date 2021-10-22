@@ -1,7 +1,7 @@
 import { getChannels } from "./channels";
-import DB from "../db";
+import DB from "../utils/db";
 import { CommandInteraction, TextChannel } from "discord.js";
-import * as ethers from "ethers";
+import { ethers } from "ethers";
 import Main from "../Main";
 import { Poll } from "../types";
 import { isWhiteListed } from "./whitelist";
@@ -9,16 +9,19 @@ import logger from "../utils/logger";
 
 const createPoll = async (
   channelId: string,
-  content: string,
+  _content: string,
   reactions: string[],
   interaction?: CommandInteraction,
   signed?: string
 ): Promise<boolean> => {
   try {
-    const address = ethers.utils.verifyMessage("Hello world", signed);
+    const address = signed
+      ? ethers.utils.verifyMessage("Hello world", signed)
+      : null;
     const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
+    const content = `Poll #${DB.lastId()}:\n\n${_content}`;
 
-    if (await isWhiteListed(channel.guildId, address)) {
+    if (!address || await isWhiteListed(channel.guildId, address)) {
       const msg: any = interaction
         ? await interaction.reply({ content, fetchReply: true })
         : await channel.send(content);
@@ -28,7 +31,8 @@ const createPoll = async (
       DB.add({
         channelId,
         messageId: msg.id,
-        reactions
+        reactions,
+        ended: false
       });
 
       return true;

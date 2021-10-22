@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 
 import JSONdb from "simple-json-db";
-import { Poll } from "./types";
+import { Poll } from "../types";
 
 export default class DB {
   private static _db: JSONdb;
