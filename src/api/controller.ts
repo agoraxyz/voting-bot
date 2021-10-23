@@ -23,17 +23,17 @@ export const controller = {
 
       const poll = DB.get(req.params.id) as Poll;
 
-      const result = await getReactions(
-        poll.channelId,
-        poll.messageId,
-        poll.reactions
-      );
+      const result = poll.ended
+        ? poll.results
+        : (
+            await getReactions(poll.channelId, poll.messageId, poll.reactions)
+          ).map((react) => react.users.length);
 
       res.set({
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
       });
-      res.status(200).json(result.map(react => react.users.length));
+      res.status(200).json(result);
     } catch (e) {
       res.status(400).json(e);
     }

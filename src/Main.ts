@@ -8,7 +8,7 @@ import config from "./config";
 import DB from "./utils/db";
 import logger from "./utils/logger";
 import { NewPoll } from "./types";
-import { createPoll } from "./service/polls";
+import { createPoll, endPoll } from "./service/polls";
 import Whitelist from "./utils/whitelist";
 
 export class Main {
@@ -77,6 +77,19 @@ export class Main {
       commands?.create({
         name: "dmpoll",
         description: "Create a poll using direct messages."
+      });
+
+      commands?.create({
+        name: "endpoll",
+        description: "Closes a poll.",
+        options: [
+          {
+            name: "id",
+            description: "The ID of the poll you want to close.",
+            required: true,
+            type: Constants.ApplicationCommandOptionTypes.NUMBER
+          }
+        ]
       });
 
       commands?.create({
@@ -196,6 +209,12 @@ export class Main {
                 ephemeral: true
               })
             );
+
+          break;
+        }
+
+        case "endpoll": {
+          endPoll(`${options.getNumber("id")}`, interaction);
 
           break;
         }

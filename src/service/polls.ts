@@ -4,8 +4,9 @@ import { CommandInteraction, TextChannel } from "discord.js";
 import { ethers } from "ethers";
 import Main from "../Main";
 import { Poll } from "../types";
-import { isWhiteListed } from "./whitelist";
 import logger from "../utils/logger";
+import { isWhiteListed } from "./whitelist";
+import { getReactions } from "./reactions";
 
 const createPoll = async (
   channelId: string,
@@ -21,7 +22,7 @@ const createPoll = async (
     const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
     const content = `Poll #${DB.lastId()}:\n\n${_content}`;
 
-    if (!address || await isWhiteListed(channel.guildId, address)) {
+    if (!address || (await isWhiteListed(channel.guildId, address))) {
       const msg: any = interaction
         ? await interaction.reply({ content, fetchReply: true })
         : await channel.send(content);
@@ -32,7 +33,8 @@ const createPoll = async (
         channelId,
         messageId: msg.id,
         reactions,
-        ended: false
+        ended: false,
+        results: []
       });
 
       return true;
@@ -52,4 +54,25 @@ const getPolls = async (guildId: string): Promise<Poll[]> => {
     .map((i) => DB.get(i.toString()));
 };
 
-export { createPoll, getPolls };
+const endPoll = async (
+  id: string,
+  interaction?: CommandInteraction
+): Promise<void> => {
+  let poll = DB.get(id);
+
+  poll.ended = true;
+  poll.results = (
+    await getReactions(poll.channelId, poll.messageId, poll.reactions)
+  ).map((react) => react.users.length);
+
+  DB.set(Number(id), poll);
+
+  interaction.reply({
+    content: `Poll #${id} has been closed`,
+    ephemeral: true
+  });
+};
+
+const hasEnded = async (id: string): Promise<boolean> => DB.get(id).ended;
+
+export { createPoll, getPolls, endPoll, hasEnded };
