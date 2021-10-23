@@ -17,7 +17,7 @@
     "discord",
     "typescript"
   ],
-  "author": "Shronk",
+  "author": "ZGEN",
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.12",
