@@ -7,17 +7,11 @@ if (envFound.error) {
 }
 
 const botToken = process.env.BOT_TOKEN;
-const guildID = process.env.GUILD_ID;
 
 if (!botToken) {
   throw new Error("You need to specify the bot's BOT_TOKEN in the .env file.");
 }
 
-if (!guildID) {
-  throw new Error("You need to specify the bot's GUILD_ID in the .env file.");
-}
-
 export default {
-  botToken,
-  guildID
+  botToken
 };

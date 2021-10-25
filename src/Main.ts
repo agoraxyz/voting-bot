@@ -35,17 +35,14 @@ export class Main {
     this._client.on("ready", async () => {
       logger.verbose("The bot is up and running");
 
-      const guild = this._client.guilds.cache.get(config.guildID);
-      const commands = guild
-        ? guild.commands
-        : this._client.application?.commands;
+      const commands = this._client.application?.commands;
 
       logger.verbose("Clearing slash commands");
 
-      (await guild.commands.fetch())
+      (await commands.fetch())
         .map((command) => command.id)
         .forEach(async (id) => {
-          await guild.commands.delete(id);
+          await commands.delete(id);
         });
 
       logger.verbose("Adding slash commands");
