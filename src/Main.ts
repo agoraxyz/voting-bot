@@ -217,29 +217,32 @@ export class Main {
         }
 
         case "whitelistadd": {
-          Whitelist.add(
-            interaction.guildId,
-            options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
-          );
+          if (interaction.member.user.id === interaction.guild.ownerId) {
+            Whitelist.add(
+              interaction.guildId,
+              options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
+            );
 
-          interaction.reply({
-            content: "The addresses have been added to the whitelist.",
-            ephemeral: true
-          });
-
+            interaction.reply({
+              content: "The addresses have been added to the whitelist.",
+              ephemeral: true
+            });
+          }
           break;
         }
 
         case "whitelistrm": {
-          Whitelist.delete(
-            interaction.guildId,
-            options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
-          );
+          if (interaction.member.user.id === interaction.guild.ownerId) {
+            Whitelist.delete(
+              interaction.guildId,
+              options.getString("addresses").match(/0x[a-zA-Z0-9]{40}/g)
+            );
 
-          interaction.reply({
-            content: "The addresses have been removed from the whitelist.",
-            ephemeral: true
-          });
+            interaction.reply({
+              content: "The addresses have been removed from the whitelist.",
+              ephemeral: true
+            });
+          }
 
           break;
         }
