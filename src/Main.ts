@@ -39,20 +39,18 @@ export class Main {
 
       logger.verbose("Clearing slash commands");
 
-      (await commands.fetch())
-        .map((command) => command.id)
-        .forEach(async (id) => {
-          await commands.delete(id);
-        });
+      (await commands.fetch()).map(
+        async (command) => await commands.delete(command.id)
+      );
 
       logger.verbose("Adding slash commands");
 
-      commands?.create({
+      commands.create({
         name: "ping",
         description: "Replies with pong."
       });
 
-      commands?.create({
+      commands.create({
         name: "poll",
         description: "Creates a poll.",
         options: [
@@ -71,12 +69,12 @@ export class Main {
         ]
       });
 
-      commands?.create({
+      commands.create({
         name: "dmpoll",
         description: "Create a poll using direct messages."
       });
 
-      commands?.create({
+      commands.create({
         name: "endpoll",
         description: "Closes a poll.",
         options: [
@@ -89,7 +87,7 @@ export class Main {
         ]
       });
 
-      commands?.create({
+      commands.create({
         name: "whitelistadd",
         description: "Add (an) address(es) to the whitelist.",
         options: [
@@ -102,7 +100,7 @@ export class Main {
         ]
       });
 
-      commands?.create({
+      commands.create({
         name: "whitelistrm",
         description: "Remove (an) address(es) from the whitelist.",
         options: [

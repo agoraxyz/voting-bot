@@ -13,7 +13,6 @@ const createRouter = () => {
     [validators.signedMsg],
     [validators.channelId],
     [validators.content],
-    [validators.reactions],
     controller.create
   );
 
