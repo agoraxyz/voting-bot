@@ -1,6 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 
-import { Client, Constants, Intents } from "discord.js";
+import { slashCommands } from "./bot/commands";
+import { Client, Intents } from "discord.js";
 import express from "express";
 import JSONdb from "simple-json-db";
 import createRouter from "./api/router";
@@ -45,73 +46,9 @@ export class Main {
 
       logger.verbose("Adding slash commands");
 
-      commands.create({
-        name: "ping",
-        description: "Replies with pong."
-      });
-
-      commands.create({
-        name: "poll",
-        description: "Creates a poll.",
-        options: [
-          {
-            name: "subject",
-            description: "The subject of the vote.",
-            required: true,
-            type: Constants.ApplicationCommandOptionTypes.STRING
-          },
-          {
-            name: "reacts",
-            description: "Emotes separated by a semicolon.",
-            required: false,
-            type: Constants.ApplicationCommandOptionTypes.STRING
-          }
-        ]
-      });
-
-      commands.create({
-        name: "dmpoll",
-        description: "Create a poll using direct messages."
-      });
-
-      commands.create({
-        name: "endpoll",
-        description: "Closes a poll.",
-        options: [
-          {
-            name: "id",
-            description: "The ID of the poll you want to close.",
-            required: true,
-            type: Constants.ApplicationCommandOptionTypes.NUMBER
-          }
-        ]
-      });
-
-      commands.create({
-        name: "whitelistadd",
-        description: "Add (an) address(es) to the whitelist.",
-        options: [
-          {
-            name: "addresses",
-            description: "Address(es) to be added to the whitelist.",
-            required: true,
-            type: Constants.ApplicationCommandOptionTypes.STRING
-          }
-        ]
-      });
-
-      commands.create({
-        name: "whitelistrm",
-        description: "Remove (an) address(es) from the whitelist.",
-        options: [
-          {
-            name: "addresses",
-            description: "Address(es) to be removed from the whitelist.",
-            required: true,
-            type: Constants.ApplicationCommandOptionTypes.STRING
-          }
-        ]
-      });
+      await Promise.all(
+        slashCommands.map(async (command) => commands.create(command))
+      );
 
       logger.verbose("Initializing database");
 

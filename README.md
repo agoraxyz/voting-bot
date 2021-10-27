@@ -130,8 +130,8 @@ Params:
 - `signed` - the message "Please sign this message to verify your address"
   signed with [ethers-js](https://docs.ethers.io/v5/api/signer/#Signer-signMessage)
 - `channelId` - the ID of the Discord channel (number)
-- `content` - the content of the message
-- `reactions` - array of emojies or Discord emote IDs
+- `content` - the content of the message (string)
+- `reactions` - array of emojies or Discord emote IDs (array of strings)
 
 Result:
 
