@@ -50,7 +50,7 @@ export const controller = {
         return;
       }
 
-      const result = await getPolls(req.params.id);
+      const result = await getPolls(req.params.serverId);
 
       res.set({
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export const controller = {
   create: async (req: Request, res: Response): Promise<void> => {
     try {
       logger.verbose(
-        `endpoint: create, params: ${JSON.stringify(req.params)}`
+        `endpoint: create, body: ${JSON.stringify(req.body)}`
       );
 
       const errors = validationResult(req);
@@ -101,11 +101,11 @@ export const controller = {
       }
 
       const result = await createPoll(
-        req.params.channelId,
-        req.params.content,
-        req.params.reactions.split(" "),
+        req.body.channelId,
+        req.body.content,
+        req.body.reactions.split(" "),
         undefined,
-        req.params.signed
+        req.body.signed
       );
 
       res.set({

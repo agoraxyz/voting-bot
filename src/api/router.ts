@@ -5,11 +5,11 @@ import validators from "./validators";
 const createRouter = () => {
   const router: Router = Router();
 
-  router.get("/reacts/:id", [validators.id], controller.reacts);
-  router.get("/polls/list/:id", [validators.id], controller.list);
+  router.get("/reacts/:id", [validators.pollId], controller.reacts);
+  router.get("/polls/list/:serverId", [validators.serverId], controller.list);
   router.get("/channels/:userId", [validators.userId], controller.channels);
-  router.get(
-    "/polls/create/:signed/:channelId/:content/:reactions",
+  router.post(
+    "/polls/create",
     [validators.signedMsg],
     [validators.channelId],
     [validators.content],

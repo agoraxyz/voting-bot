@@ -12,7 +12,7 @@ type Poll = {
   messageId: string;
   reactions: string[];
   ended: boolean;
-  results: number[]
+  results: number[];
 };
 
 type Reaction = {

@@ -17,7 +17,10 @@ const createPoll = async (
 ): Promise<boolean> => {
   try {
     const address = signed
-      ? ethers.utils.verifyMessage("Hello world", signed)
+      ? ethers.utils.verifyMessage(
+          "Please sign this message to verify your address",
+          signed
+        )
       : null;
     const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
     const content = `Poll #${DB.lastId()}:\n\n${_content}`;
