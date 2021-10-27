@@ -37,7 +37,7 @@ The following API endpoints are available:
 
 ---
 
-GET `/reacts/:id` - Get the count of all the valid reacts from a poll message
+GET `/api/reacts/:id` - Get the count of all the valid reacts from a poll message
 
 Params:
 
@@ -57,7 +57,7 @@ curl https://voting.guild.xyz/api/reacts/23 && echo
 
 ---
 
-GET `/polls/list/:serverId` - Get the list of polls on a DC server
+GET `/api/polls/list/:serverId` - Get the list of polls on a DC server
 
 Params:
 
@@ -85,7 +85,7 @@ curl https://voting.guild.xyz/api/polls/list/769189093557420619 && echo
 
 ---
 
-GET `/channels/:userId` - Get the IDs of all the channels that both the given
+GET `/api/channels/:userId` - Get the IDs of all the channels that both the given
 user and the bot are members of
 
 Params:
@@ -112,7 +112,7 @@ curl https://voting.guild.xyz/api/channels/690800923355730718 && echo
 
 ---
 
-POST `/polls/create/:signed/:channelId/:content/:reactions` - Create a poll in
+POST `/api/polls/create` - Create a poll in
 the specified channel with the given content and reactions. A message signed
 with the user's wallet is used to authenticate the user.
 
@@ -145,7 +145,7 @@ Example:
 curl -X POST https://voting.guild.xyz/api/polls/create \
   -H 'Content-Type: application/json' \
   -d '{
-    "signed": "0x14280e5885a19f60e536de50097e96e3738c7acae4e9e62d67272d794b8127d31c03d9cd59781d4ee31fb4e1b893bd9b020ec67dfa65cfb51e2bdadbb1de26d91c",
+    "signed": "0x14280e5885a...fb51e2bdadbb1de26d91c",
     "channelId": "694903617830662174",
     "content": "Do you enjoy the presentation?\n(🤩 - yes / 😴 - no)",
     "reactions": ["🤩", "😴"]
@@ -167,7 +167,7 @@ yarn install
 Create a new file called .env and add the following environment variables:
 
 ```txt
-BOT_TOKEN=7812MjU5O7812jUz7812Nzg3.YQ10pw.8Ae7812uC4VS3v7812V9xq7812Y
+BOT_TOKEN=
 ```
 
 Run the bot:
