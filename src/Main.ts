@@ -46,9 +46,7 @@ export class Main {
 
       logger.verbose("Adding slash commands");
 
-      await Promise.all(
-        slashCommands.map(async (command) => commands.create(command))
-      );
+      slashCommands.forEach((command) => commands.create(command));
 
       logger.verbose("Initializing database");
 

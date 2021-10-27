@@ -4,7 +4,7 @@
   "description": "",
   "main": "build/Main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --skipLibCheck",
     "prod": "node build/Main.js",
     "dev": "ts-node src/Main.ts"
   },
