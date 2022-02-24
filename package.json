@@ -7,7 +7,11 @@
     "build": "tsc --skipLibCheck",
     "prod": "node build/Main.js",
     "dev": "ts-node src/Main.ts",
-    "clean": "rm -rf build/"
+    "clean": "rm -rf build/",
+    "prepare": "husky install",
+    "type-check": "tsc --pretty --noEmit",
+    "format": "prettier --write .",
+    "lint-fix": "eslint --fix . --ext .ts,.tsx,.js,.jsx"
   },
   "keywords": [
     "discordx",

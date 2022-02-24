@@ -1,9 +1,10 @@
-/* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
+/* eslint no-underscore-dangle: "off" */
+/* eslint no-return-await: "off" */
 
-import { slashCommands } from "./bot/commands";
 import { Client, Intents } from "discord.js";
 import express from "express";
 import JSONdb from "simple-json-db";
+import { slashCommands } from "./bot/commands";
 import createRouter from "./api/router";
 import config from "./config";
 import DB from "./utils/db";

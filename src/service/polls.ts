@@ -1,7 +1,7 @@
-import { getChannels } from "./channels";
-import DB from "../utils/db";
 import { CommandInteraction, TextChannel } from "discord.js";
 import { ethers } from "ethers";
+import { getChannels } from "./channels";
+import DB from "../utils/db";
 import Main from "../Main";
 import { Poll } from "../types";
 import logger from "../utils/logger";
@@ -61,7 +61,7 @@ const endPoll = async (
   id: string,
   interaction?: CommandInteraction
 ): Promise<void> => {
-  let poll = DB.get(id);
+  const poll = DB.get(id);
 
   poll.ended = true;
   poll.results = (

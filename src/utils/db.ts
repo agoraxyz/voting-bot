@@ -1,4 +1,4 @@
-/* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
+/* eslint no-underscore-dangle: "off" */
 
 import JSONdb from "simple-json-db";
 import { Poll } from "../types";

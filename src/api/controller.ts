@@ -89,9 +89,7 @@ export const controller = {
 
   create: async (req: Request, res: Response): Promise<void> => {
     try {
-      logger.verbose(
-        `endpoint: create, body: ${JSON.stringify(req.body)}`
-      );
+      logger.verbose(`endpoint: create, body: ${JSON.stringify(req.body)}`);
 
       const errors = validationResult(req);
 

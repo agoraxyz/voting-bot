@@ -1,4 +1,4 @@
-/* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
+/* eslint no-underscore-dangle: "off" */
 
 import JSONdb from "simple-json-db";
 
@@ -12,7 +12,7 @@ export default class Whitelist {
   static add = (serverId: string, addresses: string[]) => {
     const addrsInDb = this._db.get(serverId) as string[];
 
-    let addrs = [...new Set(addresses.concat(addrsInDb ? addrsInDb : []))];
+    const addrs = [...new Set(addresses.concat(addrsInDb || []))];
 
     this._db.set(serverId, addrs);
     this._db.sync();
