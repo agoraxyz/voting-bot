@@ -1,5 +1,6 @@
 import { CommandInteraction, TextChannel } from "discord.js";
 import { ethers } from "ethers";
+import dayjs from "dayjs";
 import { getChannels } from "./channels";
 import DB from "../utils/db";
 import Main from "../Main";
@@ -12,6 +13,7 @@ const createPoll = async (
   channelId: string,
   _content: string,
   reactions: string[],
+  endDate: dayjs.Dayjs,
   interaction?: CommandInteraction,
   signed?: string
 ): Promise<boolean> => {
@@ -36,6 +38,7 @@ const createPoll = async (
         channelId,
         messageId: msg.id,
         reactions,
+        endDate,
         ended: false,
         results: []
       });

@@ -1,9 +1,7 @@
 /* eslint no-underscore-dangle: "off" */
-/* eslint no-return-await: "off" */
 
 import { Client, Intents } from "discord.js";
 import express from "express";
-import { slashCommands } from "./bot/commands/list";
 import createRouter from "./api/router";
 import config from "./config";
 import DB from "./utils/db";
@@ -34,20 +32,6 @@ export class Main {
 
     this._client.on("ready", async () => {
       logger.verbose("The bot is up and running");
-
-      const commands = this._client.application?.commands;
-
-      logger.verbose("Clearing slash commands");
-
-      (await commands.fetch()).map(
-        async (command) => await commands.delete(command.id)
-      );
-
-      logger.verbose("Adding slash commands");
-
-      await Promise.all(
-        slashCommands.map(async (command) => await commands.create(command))
-      );
 
       logger.verbose("Initializing database");
 

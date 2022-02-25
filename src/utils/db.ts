@@ -1,4 +1,5 @@
 /* eslint no-underscore-dangle: "off" */
+/* eslint no-plusplus: "off" */
 
 import JSONdb from "simple-json-db";
 import { Poll } from "../types";
@@ -24,7 +25,7 @@ export default class DB {
 
   static add = (value: Poll) => {
     this.set(this._id, value);
-    this._id += 1;
+    this._id++;
     this._db.set("id", { value: this._id.toString() });
   };
 

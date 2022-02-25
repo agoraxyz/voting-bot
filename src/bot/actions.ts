@@ -1,3 +1,6 @@
+/* eslint no-plusplus: "off" */
+
+import dayjs from "dayjs";
 import JSONdb from "simple-json-db";
 import { createPoll } from "../service/polls";
 import { NewPoll } from "../types";
@@ -43,36 +46,114 @@ const messageCreate = async (message) => {
     if (poll) {
       switch (poll.status) {
         case 1: {
-          poll.reactions = message.content
-            .split("\n")
-            .filter((line) => /^.+-.+$/.test(line))
-            .map((line) => line.split("-")[0].trim());
+          if (message.content === "next") {
+            ++poll.status;
 
-          if (message.content.split("\n").length === poll.reactions.length) {
-            poll.content += `\n\n${message.content}`;
+            await message.reply(
+              `Now send me the emoji for the option ${
+                poll.options[poll.optionIdx]
+              }`
+            );
 
-            await createPoll(poll.channelId, poll.content, poll.reactions);
-
-            db.delete(authorId);
-            db.sync();
+            ++poll.optionIdx;
           } else {
-            message.channel.send("Please check the example and try again.");
+            poll.options.push(message.content);
+          }
+          db.set(authorId, poll);
+          db.sync();
+
+          break;
+        }
+
+        case 2: {
+          poll.reactions.push(message.content);
+
+          await message.reply(
+            `Now send me the emoji for the option ${
+              poll.options[poll.optionIdx]
+            }`
+          );
+
+          if (poll.optionIdx >= poll.options.length) {
+            ++poll.status;
+            message.reply(
+              "Give me the end date of the poll in the DD:HH:mm format"
+            );
+          } else {
+            ++poll.optionIdx;
+          }
+
+          db.set(authorId, poll);
+          db.sync();
+
+          break;
+        }
+
+        case 3: {
+          try {
+            const duration = message.content.split(":");
+
+            const expDate = dayjs()
+              .add(parseInt(duration[0], 10), "day")
+              .add(parseInt(duration[1], 10), "hour")
+              .add(parseInt(duration[2], 10), "minute");
+
+            poll.endDate = expDate;
+
+            db.set(authorId, poll);
+            db.sync();
+
+            await message.reply("Your poll will look like thisn");
+
+            let content = `${poll.question}\n`;
+
+            for (let i = 0; i < poll.options.length; ++i) {
+              content += `\n${poll.reactions[i]} - ${poll.options[i]}`;
+            }
+
+            await message.reply(content);
+
+            await message.reply(
+              "You can accept it by using /done,\n" +
+                "reset the data by using /reset\n" +
+                "or cancet it using /cancel."
+            );
+          } catch (e) {
+            message.reply("Incorrect input, please try again.");
           }
 
           break;
         }
 
+        case 4: {
+          let content = `${poll.question}\n`;
+
+          for (let i = 0; i < poll.options.length; ++i) {
+            content += `\n${poll.reactions[i]} - ${poll.options[i]}`;
+          }
+
+          await createPoll(
+            poll.channelId,
+            content,
+            poll.reactions,
+            poll.endDate
+          );
+
+          db.delete(authorId);
+          db.sync();
+
+          break;
+        }
+
         default: {
-          poll.content = message.content;
-          poll.status = 1;
+          poll.question = message.content;
+          ++poll.status;
 
           db.set(authorId, poll);
           db.sync();
 
           message.channel.send(
-            "Give me the options for the poll. For example:\n" +
-              "🥵 - yes\n" +
-              "🥴 - no\n"
+            "Give me the options for the poll (one-by-one)"
           );
 
           break;
