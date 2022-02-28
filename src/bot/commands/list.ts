@@ -10,6 +10,10 @@ export const slashCommands = [
     description: "Creates a poll."
   },
   {
+    name: "enough",
+    description: "Skips adding poll options."
+  },
+  {
     name: "done",
     description: "Finalizes a poll."
   },

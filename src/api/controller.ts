@@ -4,7 +4,7 @@ import DB from "../utils/db";
 import { getAvailableChannels } from "../service/channels";
 import { createPoll, getPolls } from "../service/polls";
 import { getReactions } from "../service/reactions";
-import { Poll } from "../types";
+import { NewPoll, Poll } from "../types";
 import logger from "../utils/logger";
 
 export const controller = {
@@ -98,13 +98,17 @@ export const controller = {
         return;
       }
 
-      const result = await createPoll(
-        req.body.channelId,
-        req.body.content,
-        req.body.reactions,
-        undefined,
-        req.body.signed
-      );
+      /* prettier-ignore */
+      const poll = {
+        status   : 3,
+        channelId: req.body.channelId,
+        question : req.body.question,
+        options  : req.body.options,
+        reactions: req.body.reactions,
+        endDate  : req.body.reactions
+      } as NewPoll;
+
+      const result = await createPoll(poll);
 
       res.set({
         "Content-Type": "application/json",

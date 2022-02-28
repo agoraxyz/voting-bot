@@ -3,12 +3,13 @@
 
 import dayjs from "dayjs";
 import JSONdb from "simple-json-db";
-import { createPoll } from "../service/polls";
 import { NewPoll } from "../types";
 import logger from "../utils/logger";
 import {
   cancelPollCommand,
+  doneCommand,
   endPollCommand,
+  enoughCommand,
   pingCommand,
   pollCommand,
   resetPollCommand
@@ -23,6 +24,8 @@ const interactionCreate = async (interaction) => {
     ping: pingCommand,
     poll: pollCommand,
     endpoll: endPollCommand,
+    enough: enoughCommand,
+    done: doneCommand,
     reset: resetPollCommand,
     cancel: cancelPollCommand
   };
@@ -43,19 +46,23 @@ const messageCreate = async (message) => {
     if (poll) {
       switch (poll.status) {
         case 1: {
-          if (message.content === "next") {
-            ++poll.status;
-
-            await message.reply(
-              `Now send me the emoji for the option ${
-                poll.options[poll.optionIdx]
-              }`
-            );
-
-            ++poll.optionIdx;
-          } else {
+          if (poll.options.length === poll.reactions.length) {
             poll.options.push(message.content);
+
+            message.reply("Now send me the corresponding emoji");
+          } else {
+            poll.reactions.push(message.content);
+
+            if (poll.options.length === 2) {
+              message.reply(
+                "Give me a new option or go to the nex step by using " +
+                  "**/enough**"
+              );
+            } else {
+              message.reply("Give me the next option");
+            }
           }
+
           db.set(authorId, poll);
           db.sync();
 
@@ -63,30 +70,6 @@ const messageCreate = async (message) => {
         }
 
         case 2: {
-          poll.reactions.push(message.content);
-
-          await message.reply(
-            `Now send me the emoji for the option ${
-              poll.options[poll.optionIdx]
-            }`
-          );
-
-          if (poll.optionIdx >= poll.options.length) {
-            ++poll.status;
-            message.reply(
-              "Give me the end date of the poll in the DD:HH:mm format"
-            );
-          } else {
-            ++poll.optionIdx;
-          }
-
-          db.set(authorId, poll);
-          db.sync();
-
-          break;
-        }
-
-        case 3: {
           try {
             const duration = message.content.split(":");
 
@@ -96,6 +79,7 @@ const messageCreate = async (message) => {
               .add(parseInt(duration[2], 10), "minute");
 
             poll.endDate = expDate;
+            ++poll.status;
 
             db.set(authorId, poll);
             db.sync();
@@ -105,7 +89,7 @@ const messageCreate = async (message) => {
             let content = `${poll.question}\n`;
 
             for (let i = 0; i < poll.options.length; ++i) {
-              content += `\n${poll.reactions[i]} - ${poll.options[i]}`;
+              content += `\n${poll.reactions[i]} ${poll.options[i]}`;
             }
 
             const msg = await message.reply(content);
@@ -113,33 +97,13 @@ const messageCreate = async (message) => {
             poll.reactions.map(async (emoji) => await msg.react(emoji));
 
             await message.reply(
-              "You can accept it by using /done,\n" +
-                "reset the data by using /reset\n" +
-                "or cancel it using /cancel."
+              "You can accept it by using **/done**,\n" +
+                "reset the data by using **/reset**\n" +
+                "or cancel it using **/cancel**."
             );
           } catch (e) {
             message.reply("Incorrect input, please try again.");
           }
-
-          break;
-        }
-
-        case 4: {
-          let content = `${poll.question}\n`;
-
-          for (let i = 0; i < poll.options.length; ++i) {
-            content += `\n${poll.reactions[i]} - ${poll.options[i]}`;
-          }
-
-          await createPoll(
-            poll.channelId,
-            content,
-            poll.reactions,
-            poll.endDate
-          );
-
-          db.delete(authorId);
-          db.sync();
 
           break;
         }
@@ -152,7 +116,8 @@ const messageCreate = async (message) => {
           db.sync();
 
           message.channel.send(
-            "Give me the options for the poll (one-by-one)"
+            "Give me the options and the corresponding emojies for the poll " +
+              "(one after another)"
           );
 
           break;
@@ -178,7 +143,8 @@ const messageReactionAdd = async (reaction, user) => {
   logger.verbose(user);
 
   logger.verbose(
-    `${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`
+    `${reaction.message.author}'s message "${reaction.message.content}" ` +
+      "gained a reaction!"
   );
 
   logger.verbose(

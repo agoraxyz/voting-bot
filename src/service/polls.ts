@@ -1,49 +1,53 @@
+/* eslint no-plusplus: "off" */
+/* eslint no-return-await: "off" */
+
 import { CommandInteraction, TextChannel } from "discord.js";
-import { ethers } from "ethers";
-import dayjs from "dayjs";
 import { getChannels } from "./channels";
 import DB from "../utils/db";
 import Main from "../Main";
-import { Poll } from "../types";
+import { NewPoll, Poll } from "../types";
 import logger from "../utils/logger";
 import { getReactions } from "./reactions";
 
 const createPoll = async (
-  channelId: string,
-  _content: string,
-  reactions: string[],
-  endDate: dayjs.Dayjs,
-  interaction?: CommandInteraction,
-  signed?: string
+  _poll: NewPoll,
+  interaction?: CommandInteraction
 ): Promise<boolean> => {
   try {
-    const address = signed
-      ? ethers.utils.verifyMessage(
-          "Please sign this message to verify your address",
-          signed
-        )
-      : null;
-    const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
-    const content = `Poll #${DB.lastId()}:\n\n${_content}`;
+    const channel = Main.Client.channels.cache.get(
+      _poll.channelId
+    ) as TextChannel;
 
-    if (!address) {
-      const msg: any = interaction
-        ? await interaction.reply({ content, fetchReply: true })
-        : await channel.send(content);
+    let content = `Poll #${DB.lastId()}:\n\n${_poll.question}\n`;
 
-      reactions.forEach((reaction) => msg.react(reaction));
-
-      DB.add({
-        channelId,
-        messageId: msg.id,
-        reactions,
-        endDate,
-        ended: false,
-        results: []
-      });
-
-      return true;
+    for (let i = 0; i < _poll.options.length; ++i) {
+      content += `\n${_poll.reactions[i]} ${_poll.options[i]} (0%)`;
     }
+
+    content += "\n\n0 people voted so far.";
+
+    const msg: any = interaction
+      ? await interaction.reply({ content, fetchReply: true })
+      : await channel.send(content);
+
+    _poll.reactions.map(async (emoji) => await msg.react(emoji));
+
+    /* prettier-ignore */
+    const poll = {
+      channelId: _poll.channelId,
+      messageId: msg.id,
+      question : _poll.question,
+      options  : _poll.options,
+      reactions: _poll.reactions,
+      endDate  : _poll.endDate,
+      ended    : false,
+      voteCount: 0,
+      results  : []
+    };
+
+    DB.add(poll);
+
+    return true;
   } catch (e) {
     logger.error(e);
   }

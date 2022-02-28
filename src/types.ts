@@ -1,23 +1,33 @@
 import dayjs from "dayjs";
 import { GuildChannel, ThreadChannel } from "discord.js";
 
+/* prettier-ignore */
 type NewPoll = {
-  status: number;
-  optionIdx: number;
+  // poll creation
+  status   : number;
+  // Discord
   channelId: string;
-  question: string;
-  options: string[];
+  // poll
+  question : string;
+  options  : string[];
   reactions: string[];
-  endDate: dayjs.Dayjs;
+  endDate  : dayjs.Dayjs;
 };
 
+/* prettier-ignore */
 type Poll = {
+  // Discord
   channelId: string;
   messageId: string;
+  // poll
+  question : string;
+  options  : string[];
   reactions: string[];
-  endDate: dayjs.Dayjs;
-  ended: boolean;
-  results: number[];
+  endDate  : dayjs.Dayjs;
+  // voting
+  ended    : boolean;
+  voteCount: number;
+  results  : number[];
 };
 
 type Reaction = {
