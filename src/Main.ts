@@ -6,8 +6,11 @@ import createRouter from "./api/router";
 import config from "./config";
 import DB from "./utils/db";
 import logger from "./utils/logger";
-import Whitelist from "./utils/whitelist";
-import { interactionCreate, messageCreate } from "./bot/actions";
+import {
+  interactionCreate,
+  messageCreate,
+  messageReactionAdd
+} from "./bot/actions";
 
 export class Main {
   private static _app: express.Application;
@@ -27,7 +30,7 @@ export class Main {
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS
       ],
-      partials: ["CHANNEL"]
+      partials: ["MESSAGE", "CHANNEL", "REACTION"]
     });
 
     this._client.on("ready", async () => {
@@ -36,10 +39,6 @@ export class Main {
       logger.verbose("Initializing database");
 
       DB.init();
-
-      logger.verbose("Initializing whitelist");
-
-      Whitelist.init();
 
       logger.verbose("Starting express server on port 8080");
 
@@ -64,6 +63,7 @@ export class Main {
 
     this._client.on("interactionCreate", interactionCreate);
     this._client.on("messageCreate", messageCreate);
+    this._client.on("messageReactionAdd", messageReactionAdd);
 
     this._client.login(config.botToken ?? "");
   }

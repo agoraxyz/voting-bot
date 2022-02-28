@@ -6,8 +6,6 @@ A simple Discord bot for creating decentralized polls.
 
 1. Add the bot to your server with
    [this link](https://discord.com/oauth2/authorize?client_id=902873515680759808&permissions=0&scope=bot%20applications.commands)
-1. Use the `/whitelist` command to add the address of the ones you trust
-   so they can create polls using the API
 1. Create polls using the slash commands or the API
 
 ## Slash commands
@@ -19,11 +17,6 @@ This bot uses the new slash commands for the best user experience.
 - `/poll <subject> <[reaction]>` Create a poll with the given attributes.
 - `/dmpoll` - Create a poll using direct messages.
 - `/endpoll <ID>` - Close the poll with the given ID.
-
-### Whitelist commands
-
-- `/whitelistadd <[address]>` - Add (an) address(es) to the whitelist.
-- `/whitelistrm <[address]>` - Remove (an) address(es) from the whitelist.
 
 ### Misc
 

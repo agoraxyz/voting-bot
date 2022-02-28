@@ -1,4 +1,5 @@
 /* eslint no-plusplus: "off" */
+/* eslint no-return-await: "off" */
 
 import dayjs from "dayjs";
 import JSONdb from "simple-json-db";
@@ -10,9 +11,7 @@ import {
   endPollCommand,
   pingCommand,
   pollCommand,
-  resetPollCommand,
-  whiteListAddCommand,
-  whiteListRmCommand
+  resetPollCommand
 } from "./commands/impl";
 
 const interactionCreate = async (interaction) => {
@@ -22,8 +21,6 @@ const interactionCreate = async (interaction) => {
 
   const commandList = {
     ping: pingCommand,
-    whitelistadd: whiteListAddCommand,
-    whitelistrm: whiteListRmCommand,
     poll: pollCommand,
     endpoll: endPollCommand,
     reset: resetPollCommand,
@@ -103,7 +100,7 @@ const messageCreate = async (message) => {
             db.set(authorId, poll);
             db.sync();
 
-            await message.reply("Your poll will look like thisn");
+            await message.reply("Your poll will look like this:");
 
             let content = `${poll.question}\n`;
 
@@ -111,12 +108,14 @@ const messageCreate = async (message) => {
               content += `\n${poll.reactions[i]} - ${poll.options[i]}`;
             }
 
-            await message.reply(content);
+            const msg = await message.reply(content);
+
+            poll.reactions.map(async (emoji) => await msg.react(emoji));
 
             await message.reply(
               "You can accept it by using /done,\n" +
                 "reset the data by using /reset\n" +
-                "or cancet it using /cancel."
+                "or cancel it using /cancel."
             );
           } catch (e) {
             message.reply("Incorrect input, please try again.");
@@ -165,4 +164,26 @@ const messageCreate = async (message) => {
   }
 };
 
-export { interactionCreate, messageCreate };
+const messageReactionAdd = async (reaction, user) => {
+  if (reaction.partial) {
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      logger.error("Something went wrong when fetching the message:", error);
+
+      return;
+    }
+  }
+
+  logger.verbose(user);
+
+  logger.verbose(
+    `${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`
+  );
+
+  logger.verbose(
+    `${reaction.count} user(s) have given the same reaction to this message!`
+  );
+};
+
+export { interactionCreate, messageCreate, messageReactionAdd };

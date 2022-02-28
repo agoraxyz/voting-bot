@@ -9,4 +9,3 @@ node_modules
 # Databases
 db.json
 polls.json
-whitelist.json

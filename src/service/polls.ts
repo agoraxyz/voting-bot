@@ -6,7 +6,6 @@ import DB from "../utils/db";
 import Main from "../Main";
 import { Poll } from "../types";
 import logger from "../utils/logger";
-import { isWhiteListed } from "./whitelist";
 import { getReactions } from "./reactions";
 
 const createPoll = async (
@@ -27,7 +26,7 @@ const createPoll = async (
     const channel = Main.Client.channels.cache.get(channelId) as TextChannel;
     const content = `Poll #${DB.lastId()}:\n\n${_content}`;
 
-    if (!address || (await isWhiteListed(channel.guildId, address))) {
+    if (!address) {
       const msg: any = interaction
         ? await interaction.reply({ content, fetchReply: true })
         : await channel.send(content);
