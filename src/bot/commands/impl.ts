@@ -13,7 +13,13 @@ const pingCommand = async (interaction) => {
 };
 
 const pollCommand = async (interaction) => {
-  if (interaction.channel.type !== "DM" && !interaction.user.bot) {
+  const owner = await interaction.guild.fetchOwner();
+
+  if (
+    interaction.channel.type !== "DM" &&
+    !interaction.user.bot &&
+    interaction.user.id === owner.id
+  ) {
     const db = new JSONdb("polls.json");
     db.set(interaction.user.id, {
       status: 0,
@@ -36,13 +42,17 @@ const pollCommand = async (interaction) => {
           ephemeral: true
         })
       );
-  } else {
-    interaction.reply({
-      content:
-        "You have to use this command in the channel " +
-        "you want the poll to appear"
-    });
-  }
+  } else if (interaction.user.id !== owner.id) {
+      interaction.reply({
+        content: "Seems like you are not the guild owner"
+      });
+    } else {
+      interaction.reply({
+        content:
+          "You have to use this command in the channel " +
+          "you want the poll to appear"
+      });
+    }
 };
 
 const endPollCommand = async (interaction) => {
@@ -66,7 +76,7 @@ const doneCommand = async (interaction) => {
   const authorId = interaction.user.id;
   const poll = db.get(authorId) as NewPoll;
 
-  if (poll.status === 3) {
+  if (poll !== undefined && poll.status === 3) {
     await createPoll(poll);
 
     interaction.reply({

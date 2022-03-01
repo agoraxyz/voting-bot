@@ -9,7 +9,8 @@ import logger from "./utils/logger";
 import {
   interactionCreate,
   messageCreate,
-  messageReactionAdd
+  messageReactionAdd,
+  messageReactionRemove
 } from "./bot/actions";
 
 export class Main {
@@ -64,6 +65,7 @@ export class Main {
     this._client.on("interactionCreate", interactionCreate);
     this._client.on("messageCreate", messageCreate);
     this._client.on("messageReactionAdd", messageReactionAdd);
+    this._client.on("messageReactionRemove", messageReactionRemove);
 
     this._client.login(config.botToken ?? "");
   }

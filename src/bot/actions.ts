@@ -1,9 +1,13 @@
 /* eslint no-plusplus: "off" */
 /* eslint no-return-await: "off" */
+/* eslint no-underscore-dangle: "off" */
+/* eslint no-await-in-loop: "off" */
 
 import dayjs from "dayjs";
 import JSONdb from "simple-json-db";
+import { getReactions } from "../service/reactions";
 import { NewPoll } from "../types";
+import DB from "../utils/db";
 import logger from "../utils/logger";
 import {
   cancelPollCommand,
@@ -20,14 +24,15 @@ const interactionCreate = async (interaction) => {
     return;
   }
 
+  /* prettier-ignore */
   const commandList = {
-    ping: pingCommand,
-    poll: pollCommand,
+    ping   : pingCommand,
+    poll   : pollCommand,
     endpoll: endPollCommand,
-    enough: enoughCommand,
-    done: doneCommand,
-    reset: resetPollCommand,
-    cancel: cancelPollCommand
+    enough : enoughCommand,
+    done   : doneCommand,
+    reset  : resetPollCommand,
+    cancel : cancelPollCommand
   };
 
   try {
@@ -129,7 +134,7 @@ const messageCreate = async (message) => {
   }
 };
 
-const messageReactionAdd = async (reaction, user) => {
+const messageReactionCommon = async (reaction, user, removed: boolean) => {
   if (reaction.partial) {
     try {
       await reaction.fetch();
@@ -140,16 +145,84 @@ const messageReactionAdd = async (reaction, user) => {
     }
   }
 
-  logger.verbose(user);
+  const msg = reaction.message;
 
-  logger.verbose(
-    `${reaction.message.author}'s message "${reaction.message.content}" ` +
-      "gained a reaction!"
-  );
+  const entries = DB.getKeys()
+    .map((key) => ({ key, poll: DB.get(key) }))
+    .filter(
+      (entry) =>
+        entry.poll.channelId === msg.channelId &&
+        entry.poll.messageId === msg.id
+    );
 
-  logger.verbose(
-    `${reaction.count} user(s) have given the same reaction to this message!`
-  );
+  if (entries !== []) {
+    const {key} = entries[0];
+    const {poll} = entries[0];
+
+    if (!removed) {
+      const emoji = reaction._emoji;
+
+      let userReactions;
+
+      if (poll.reactions.includes(`<:${emoji.name}:${emoji.id}>`)) {
+        userReactions = msg.reactions.cache.filter(
+          (react) => react.users.cache.has(user.id) && react._emoji !== emoji
+        );
+      } else {
+        userReactions = msg.reactions.cache.filter(
+          (react) => react.users.cache.has(user.id) && react._emoji === emoji
+        );
+      }
+
+      try {
+        Array.from(userReactions.values()).map(
+          async (react) => await (react as any).users.remove(user.id)
+        );
+      } catch (error) {
+        logger.error("Failed to remove reaction:", error);
+      }
+    }
+
+    const reacResults = (
+      await getReactions(poll.channelId, poll.messageId, poll.reactions)
+    ).map((react) => react.users.length);
+
+    poll.results = reacResults;
+    poll.voteCount = reacResults.reduce((a, b) => a + b);
+
+    let content = `Poll #${DB.lastId()}:\n\n${poll.question}\n`;
+
+    for (let i = 0; i < poll.options.length; ++i) {
+      let percentage = `${(reacResults[i] / poll.voteCount) * 100}`;
+
+      if (Number(percentage) % 1 !== 0) {
+        percentage = Number(percentage).toFixed(2);
+      }
+
+      content += `\n${poll.reactions[i]} ${poll.options[i]} (${percentage}%)`;
+    }
+
+    content += `\n\n${poll.voteCount} person${
+      poll.voteCount > 1 || poll.voteCount === 0 ? "s" : ""
+    } voted so far.`;
+
+    msg.edit(content);
+
+    DB.set(Number(key), poll);
+  }
 };
 
-export { interactionCreate, messageCreate, messageReactionAdd };
+const messageReactionAdd = async (reaction, user) => {
+  messageReactionCommon(reaction, user, false);
+};
+
+const messageReactionRemove = async (reaction, user) => {
+  messageReactionCommon(reaction, user, true);
+};
+
+export {
+  interactionCreate,
+  messageCreate,
+  messageReactionAdd,
+  messageReactionRemove
+};

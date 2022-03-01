@@ -34,5 +34,7 @@ export default class DB {
     this._db.sync();
   };
 
+  static getKeys = () => Object.keys(this._db.storage).filter((key) => key !== "id");
+
   static lastId = (): number => this._id;
 }
